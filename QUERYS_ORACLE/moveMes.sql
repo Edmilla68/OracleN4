@@ -1,0 +1,66 @@
+Select 
+CASE WHEN mve.MOVE_KIND  = 'RECV' THEN ufv.ARRIVE_POS_LOCID ELSE
+CASE WHEN  mve.MOVE_KIND  ='DLVR' THEN ufv.LAST_POS_LOCID ELSE ufv.LAST_POS_LOCID END END AS "Carrier Visit",
+
+
+CASE WHEN chec.FULL_NAME IS NULL THEN ' ' ELSE chec.FULL_NAME END AS "Carry CHE Name",
+CASE WHEN checr.full_name IS NULL THEN ' ' ELSE checr.full_name END AS "Crane CHE Name",
+CASE WHEN chef.FULL_NAME IS NULL THEN ' ' ELSE chef.FULL_NAME END AS "Fetch CHE Name",
+mve.FM_POS_NAME AS "From Position",
+CASE mve.MOVE_KIND
+  WHEN 'RECV' THEN 'Receival'
+  WHEN 'DLVR' THEN 'Delivery'
+  else mve.MOVE_KIND
+END AS "Move Kind",
+CASE WHEN mve.CHE_PUT_LOGIN_NAME IS NULL THEN ' ' ELSE mve.CHE_PUT_LOGIN_NAME END AS "Put CHE Login Name",
+CASE WHEN chep.FULL_NAME IS NULL THEN ' ' ELSE chep.FULL_NAME END AS "Put CHE Name",
+TO_CHAR(mve.T_PUT,'YYYY-MM-DD HH24:MI') AS "Time Completed",
+ut.id AS "Unit Nbr",
+mve.TO_POS_NAME AS "To Position",
+CASE ut.category
+  WHEN 'IMPRT' THEN 'Import'
+  WHEN 'EXPRT' THEN 'Export'
+  WHEN 'THRGH' THEN 'Through'
+  WHEN 'TRSHP' THEN 'Transship'
+  WHEN 'STRGE' THEN 'Storage'
+  else ut.category
+END AS "Unit Category",
+CASE WHEN ut.FLEX_STRING10 IS NULL THEN ' ' ELSE ut.FLEX_STRING10 END AS "Unit Deposito Temporal",
+ufv.ARRIVE_POS_LOCID AS "Unit I/B Actual Visit",
+ut.IS_OOG AS "Unit Is OOG",
+ufv.LAST_POS_LOCID AS "Unit O/B Actual Visit",
+TO_CHAR(ufv.TIME_IN,'YYYY-MM-DD HH24:MI') AS "Unit Time In",
+CASE WHEN TO_CHAR(ufv.TIME_OUT,'YYYY-MM-DD HH24:MI') IS NULL THEN ' ' ELSE TO_CHAR(ufv.TIME_OUT,'YYYY-MM-DD HH24:MI') END AS "Unit Time Out",
+CASE ret.nominal_height
+  WHEN 'NOM96' THEN '9''6'''''
+  WHEN 'NOM86' THEN '8''6'''''
+  else ret.nominal_height
+END AS "Unit Type Height",
+ret.id AS "Unit Type ISO",
+CASE ret.nominal_length
+  WHEN 'NOM40' THEN '40'''
+  WHEN 'NOM20' THEN '20'''
+  else RET.nominal_length
+END AS "Unit Type Length",
+ut.GOODS_AND_CTR_WT_KG AS "Unit Weight (kg)"
+
+From USRTOSN4P.inv_move_event mve
+
+    INNER JOIN USRTOSN4P.INV_UNIT_FCY_VISIT UFV           ON UFV.GKEY = mve.UFV_GKEY
+    INNER JOIN USRTOSN4P.inv_unit ut          ON ut.GKEY = UFV.UNIT_GKEY
+    INNER JOIN USRTOSN4P.REF_EQUIPMENT RE ON ut.ID = RE.ID_FULL
+    INNER JOIN USRTOSN4P.REF_EQUIP_TYPE RET  ON RET.GKEY =RE.EQTYP_GKEY
+    
+    
+    
+    LEFT OUTER JOIN USRTOSN4P.XPS_CHE CHEC       ON CHEC.GKEY = MVE.CHE_CARRY
+    LEFT OUTER JOIN USRTOSN4P.XPS_CHE CHEF       ON CHEF.GKEY = MVE.CHE_FETCH
+    LEFT OUTER JOIN USRTOSN4P.XPS_CHE CHECR       ON CHECR.GKEY = MVE.CHE_QC
+    LEFT       JOIN USRTOSN4P.XPS_CHE CHEP       ON CHEP.GKEY = MVE.CHE_PUT
+
+WHERE
+mve.MOVE_KIND in ('RECV','DLVR')  AND
+--ut.ID = 'FCIU9381295' AND
+mve.T_PUT >= TRUNC(SYSDATE)-111  AND
+--mve.T_PUT <  TO_DATE('2019-11-02 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND
+UFV.FCY_GKEY = 3334231702; 

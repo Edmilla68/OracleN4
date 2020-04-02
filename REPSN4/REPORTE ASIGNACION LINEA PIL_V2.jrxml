@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="REPORTE PIL" language="groovy" pageWidth="2880" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2840" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9cb5beff-5a8c-4238-843a-582e711cdee6">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="ireport.x" value="610"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="fechaETAInicio" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fechaETAFin" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[/*============== LINEA PIL ==============================*/
+SELECT
+TO_CHAR(VVD.PUBLISHED_ETA,'DD/MM/YYYY') AS "FECHA ETA",
+U.ID AS "Nro Contenedor",
+CASE WHEN (RET.ID = '22P1' OR RET.ID = '42P3') THEN 'FR'    ELSE
+CASE WHEN (RET.ID = 'L5G1' OR RET.ID = '45RH' OR RET.ID = '25R1') THEN 'RH'  ELSE
+CASE WHEN (RET.ID = '42P1' OR RET.ID = '22P0') THEN 'FL'     ELSE
+CASE WHEN (RET.ID = 'L5R1' OR RET.ID = '45RH' OR RET.ID = '25R1') THEN 'RH' ELSE
+CASE WHEN (RET.ID = '22B0') THEN 'BL' ELSE
+CASE WHEN (RET.ID = '45P3' ) THEN 'FH'   ELSE
+CASE WHEN (RET.ID = 'L5G1' ) THEN 'HC' ELSE
+CASE WHEN (RET.ID = '42V0' ) THEN 'HV' ELSE
+CASE WHEN (RET.ID = '25U1' ) THEN 'OH' ELSE
+CASE WHEN (RET.ID = '22P5') THEN 'OS' ELSE
+CASE WHEN (RET.ID = '42R0') THEN 'R1' ELSE
+CASE WHEN (RET.ID = '22R0') THEN 'RC' ELSE
+CASE WHEN (RET.ID = '42R0') THEN 'RF' ELSE
+CASE WHEN (RET.ID = '28U1') THEN 'TS'  ELSE
+CASE WHEN (RET.ID = '22V0') THEN 'VH'  ELSE
+CASE WHEN arq.ID = '20DR' THEN 'ST'  ELSE
+CASE WHEN arq.ID = '20OT' THEN  'OT' ELSE
+CASE WHEN arq.ID = '20RF' THEN 'RF'  ELSE
+CASE WHEN arq.ID = '20TK' THEN 'TK'  ELSE
+CASE WHEN arq.ID = '40DR' THEN 'ST' ELSE
+CASE WHEN arq.ID = '40HC' THEN 'HC'  ELSE
+CASE WHEN arq.ID = '40OT' THEN 'OT'  ELSE
+CASE WHEN arq.ID = '40PL' THEN 'PL' ELSE
+CASE WHEN arq.ID = '40RH' THEN 'RH' ELSE
+CASE WHEN arq.ID = '40TK' THEN 'TK' ELSE
+CASE WHEN arq.ID = 'L500' THEN 'TK' ELSE
+CASE WHEN arq.ID = '2500' THEN 'HC' ELSE ARQ.ID
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END
+END AS "TIPO",
+CASE RET.NOMINAL_LENGTH WHEN 'NOM40' THEN '40' ELSE
+CASE RET.NOMINAL_LENGTH WHEN 'NOM45' THEN '45' ELSE
+CASE RET.NOMINAL_LENGTH WHEN 'NOM20' THEN '20' ELSE
+RET.NOMINAL_LENGTH
+END END END  AS "TAMAÑO",
+RE.TARE_KG AS "TARA",
+ABS(RE.SAFE_KG - RE.TARE_KG) AS "PAYLOAD",
+BS.ID AS "Linea Naviera",
+U.FREIGHT_KIND AS "CONDICION ORIGEN",
+TO_CHAR(EV.PLACED_TIME,'DD/MM/YYYY') AS "FECHA ASIGNACION",
+TO_CHAR(UF.TIME_OUT,'DD/MM/YYYY') AS "FECHA GATE OUT",
+VS.NAME AS "NAVE",
+VVD.OB_VYG AS "VIAJE",
+EQBO.DESTINATION AS "ID PUERTO DESTINO",
+EQBO.CUSTDFF_EDO_FLEX_STRING22 AS "ID PUERTO DESTINO FINAL",
+BSA.ID AS "AGENT",
+EQBO.CUSTDFF_EDO_FLEX_STRING05 AS "CLIENTE",
+EQBO.NBR AS "NRO BOOKING",
+U.SEAL_NBR1 AS "SEAL#1",
+U.SEAL_NBR2 AS "SEAL#2",
+U.SEAL_NBR3 AS "SEAL#3",
+U.SEAL_NBR4 AS "SEAL#4"
+FROM INV_UNIT U
+LEFT OUTER JOIN INV_UNIT_FCY_VISIT UF        ON U.GKEY = UF.UNIT_GKEY
+LEFT OUTER JOIN REF_BIZUNIT_SCOPED BS        ON U.LINE_OP = BS.GKEY  AND BS.ROLE = 'LINEOP'
+INNER JOIN INV_EQ_BASE_ORDER_ITEM EQBOI on U.DEPART_ORDER_ITEM_GKEY = EQBOI.GKEY
+LEFT OUTER JOIN INV_EQ_BASE_ORDER EQBO on EQBO.GKEY = EQBOI.EQO_GKEY AND EQBO.SUB_TYPE = 'EDO'
+LEFT OUTER JOIN REF_EQUIPMENT RE             ON U.ID = RE.ID_FULL
+LEFT OUTER JOIN REF_EQUIP_TYPE RET           ON RET.GKEY =RE.EQTYP_GKEY
+LEFT OUTER JOIN REF_EQUIP_TYPE ARQ           ON ARQ.GKEY = RET.ARCHETYPE
+LEFT OUTER JOIN ARGO_CARRIER_VISIT CV        ON CV.GKEY = EQBO.VESSEL_VISIT_GKEY
+LEFT OUTER JOIN VSL_VESSEL_VISIT_DETAILS VVD ON VVD.VVD_GKEY = CV.CVCVD_GKEY
+LEFT OUTER JOIN VSL_VESSELS VS               ON VS.GKEY = VVD.VESSEL_GKEY
+LEFT OUTER JOIN SRV_EVENT EV                 ON EV.APPLIED_TO_GKEY = EQBO.GKEY
+LEFT OUTER JOIN REF_BIZUNIT_SCOPED BSA       ON BSA.GKEY = EQBO.AGENT_GKEY AND BSA.ROLE = 'AGENT'
+WHERE
+EV.EVENT_TYPE_GKEY = 179
+AND EV.NOTE = U.ID
+AND
+EV.PLACED_TIME = (select MAX(PLACED_TIME) from USRTOSN4P.SRV_EVENT WHERE EVENT_TYPE_GKEY  = 179 AND APPLIED_TO_GKEY = EV.APPLIED_TO_GKEY AND NOTE = EV.NOTE) AND
+U.COMPLEX_GKEY = 3575349411
+AND VVD.PUBLISHED_ETA < TO_DATE($P{fechaETAFin},'YYYY/MM/DD HH24:MI')
+AND VVD.PUBLISHED_ETA > TO_DATE($P{fechaETAInicio},'YYYY/MM/DD HH24:MI')
+AND BS.ID = 'PIL']]>
+	</queryString>
+	<field name="FECHA ETA" class="java.lang.String"/>
+	<field name="Nro Contenedor" class="java.lang.String"/>
+	<field name="TIPO" class="java.lang.String"/>
+	<field name="TAMAÑO" class="java.lang.String"/>
+	<field name="TARA" class="java.lang.Double"/>
+	<field name="PAYLOAD" class="java.math.BigDecimal"/>
+	<field name="Linea Naviera" class="java.lang.String"/>
+	<field name="CONDICION ORIGEN" class="java.lang.String"/>
+	<field name="FECHA ASIGNACION" class="java.lang.String"/>
+	<field name="FECHA GATE OUT" class="java.lang.String"/>
+	<field name="NAVE" class="java.lang.String"/>
+	<field name="VIAJE" class="java.lang.String"/>
+	<field name="ID PUERTO DESTINO" class="java.lang.String"/>
+	<field name="ID PUERTO DESTINO FINAL" class="java.lang.String"/>
+	<field name="AGENT" class="java.lang.String"/>
+	<field name="CLIENTE" class="java.lang.String"/>
+	<field name="NRO BOOKING" class="java.lang.String"/>
+	<field name="SEAL#1" class="java.lang.String"/>
+	<field name="SEAL#2" class="java.lang.String"/>
+	<field name="SEAL#3" class="java.lang.String"/>
+	<field name="SEAL#4" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="156" height="20" uuid="b59411e0-e635-4ba7-b702-0226e6a241e3"/>
+				<text><![CDATA[FECHA ETA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="0" width="146" height="20" uuid="f41d2f7f-db9c-46e9-b40c-b9c927f9e272"/>
+				<text><![CDATA[Nro Contenedor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="100" height="20" uuid="f889c7af-56e9-436f-a1bc-62a27895e7c3"/>
+				<text><![CDATA[TIPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="0" width="100" height="20" uuid="e1122287-f50f-4bbf-aca8-ba49503ee226"/>
+				<text><![CDATA[TAMAÑO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="100" height="20" uuid="b7c0fecc-ad32-4217-b8bc-b5d5b4d428f7"/>
+				<text><![CDATA[TARA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="602" y="0" width="100" height="20" uuid="8adbb673-9897-4b9f-9dcf-d184d03075f2"/>
+				<text><![CDATA[PAYLOAD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="100" height="20" uuid="e24d75c0-fdef-4581-b8e2-fbc58b994d1a"/>
+				<text><![CDATA[Linea Naviera]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="802" y="0" width="100" height="20" uuid="18961233-f4cd-4626-a7e6-ff1e9b37b607"/>
+				<text><![CDATA[CONDICION ORIGEN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="902" y="0" width="155" height="20" uuid="94f50d2b-4734-4534-99a0-3f58e64dcea0"/>
+				<text><![CDATA[FECHA ASIGNACION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1057" y="0" width="100" height="20" uuid="1066a894-cfac-49f6-8063-2141176e584d"/>
+				<text><![CDATA[FECHA GATE OUT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1157" y="0" width="100" height="20" uuid="e13f94f6-2af3-47f5-ab11-ea3502443531"/>
+				<text><![CDATA[NAVE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1257" y="0" width="100" height="20" uuid="079e5318-ba62-4581-914e-430ec09768a1"/>
+				<text><![CDATA[VIAJE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1357" y="0" width="143" height="20" uuid="0514a695-1b27-4807-87a9-43a2915e78a1"/>
+				<text><![CDATA[ID PUERTO DESTINO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1500" y="0" width="167" height="20" uuid="d4bc6a9a-dad2-4439-81e9-7b3ff0dc7910"/>
+				<text><![CDATA[ID PUERTO DESTINO FINAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1767" y="0" width="128" height="20" uuid="7c3af62a-50a5-4004-b573-cbd5e772f7e4"/>
+				<text><![CDATA[CLIENTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1895" y="0" width="155" height="20" uuid="2ecd5fa3-6b69-4ea4-be98-20e8347dd6d8"/>
+				<text><![CDATA[NRO BOOKING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2050" y="0" width="166" height="20" uuid="c5474348-0532-423c-b0ca-b2936eef36c1"/>
+				<text><![CDATA[SEAL#1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2216" y="0" width="182" height="20" uuid="5ca1a4ca-4e5d-4f7c-9a26-72b7d2c39497"/>
+				<text><![CDATA[SEAL#2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2398" y="0" width="155" height="20" uuid="8a372439-ce1b-4c2d-9865-b00c4c890f03"/>
+				<text><![CDATA[SEAL#3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2553" y="0" width="166" height="20" uuid="35d1a6e5-b785-4f4d-b9df-6e286245f925"/>
+				<text><![CDATA[SEAL#4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1667" y="0" width="100" height="20" uuid="e04a8d0b-c947-4be4-8b71-29e28c09bfed"/>
+				<text><![CDATA[AGENT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="156" height="20" uuid="5cf2930a-3160-4be0-96d4-0aee8d7538f2"/>
+				<textFieldExpression><![CDATA[$F{FECHA ETA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="156" y="0" width="146" height="20" uuid="651064c7-5c68-48b9-8853-f07d5fe950e7"/>
+				<textFieldExpression><![CDATA[$F{Nro Contenedor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="0" width="100" height="20" uuid="bcc0adda-ac31-4c50-89dc-32e1d710a7f0"/>
+				<textFieldExpression><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="402" y="0" width="100" height="20" uuid="d3096090-a19c-4834-b21c-d196900a8544"/>
+				<textFieldExpression><![CDATA[$F{TAMAÑO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="502" y="0" width="100" height="20" uuid="06c85ba5-2da1-43ff-8eb5-4a59a20c8ade"/>
+				<textFieldExpression><![CDATA[$F{TARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="602" y="0" width="100" height="20" uuid="c13ca2f8-4877-401c-a40d-dfbc410026ec"/>
+				<textFieldExpression><![CDATA[$F{PAYLOAD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="702" y="0" width="100" height="20" uuid="d12b53db-5331-43c4-9c3c-32ac5febef8a"/>
+				<textFieldExpression><![CDATA[$F{Linea Naviera}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="802" y="0" width="100" height="20" uuid="30b14b6c-fed0-4c34-ae1d-3b05f763db8a"/>
+				<textFieldExpression><![CDATA[$F{CONDICION ORIGEN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="902" y="0" width="155" height="20" uuid="37b05d3c-89b5-4d0f-8a79-2a8ff1154cab"/>
+				<textFieldExpression><![CDATA[$F{FECHA ASIGNACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1057" y="0" width="100" height="20" uuid="ab931ee4-e7f3-4d61-8a75-68c1ee90ebb4"/>
+				<textFieldExpression><![CDATA[$F{FECHA GATE OUT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1157" y="0" width="100" height="20" uuid="576ef776-c18e-41ce-81af-96a3ded9fbf3"/>
+				<textFieldExpression><![CDATA[$F{NAVE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1257" y="0" width="100" height="20" uuid="00bc7ad2-1ebd-4f11-808b-2bf0bf9fcdd6"/>
+				<textFieldExpression><![CDATA[$F{VIAJE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1357" y="0" width="143" height="20" uuid="1e34b890-871f-4e49-b30c-aa430a6388c2"/>
+				<textFieldExpression><![CDATA[$F{ID PUERTO DESTINO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1500" y="0" width="167" height="20" uuid="f7f4fecb-9bd6-4c36-bce3-2b987a3ef033"/>
+				<textFieldExpression><![CDATA[$F{ID PUERTO DESTINO FINAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1767" y="0" width="128" height="20" uuid="dc746376-cc74-49a2-ac2a-778f6c3d2ca0"/>
+				<textFieldExpression><![CDATA[$F{CLIENTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1895" y="0" width="155" height="20" uuid="2dc8bf63-9c73-4f5d-9237-b02a8b628cff"/>
+				<textFieldExpression><![CDATA[$F{NRO BOOKING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2050" y="0" width="166" height="20" uuid="83d8e088-2ae4-4128-a571-49530dbfdb19"/>
+				<textFieldExpression><![CDATA[$F{SEAL#1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2216" y="0" width="182" height="20" uuid="84245526-f427-4476-8724-465921292a07"/>
+				<textFieldExpression><![CDATA[$F{SEAL#2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2398" y="0" width="155" height="20" uuid="6d7f7a8d-24ee-463a-9299-77440ec90cb7"/>
+				<textFieldExpression><![CDATA[$F{SEAL#3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2553" y="0" width="166" height="20" uuid="f4897b3d-7633-4334-9514-e2a8ace99866"/>
+				<textFieldExpression><![CDATA[$F{SEAL#4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1667" y="0" width="100" height="20" uuid="f8f10787-039a-4db3-8d49-c1fd6fcd2b9e"/>
+				<textFieldExpression><![CDATA[$F{AGENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
