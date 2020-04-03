@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="2286" pageHeight="595" orientation="Landscape" columnWidth="2246" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="35bcd7db-df0e-4b01-86d3-76983b5338c1">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="fechaETAInicio" class="java.lang.String"/>
+	<parameter name="fechaETAFin" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+U.ID                                    AS "EQUIPAMIENTO",
+'SUBSTR(RET.ID,1,2)'                      AS "TIPO",
+'SUBSTR(RET.ID,3,2)'                      AS "TAMAÑO",
+'RE.TARE_KG'                              AS "TARA",
+'RET.SAFE_WEIGHT_KG - RET.TARE_WEIGHT_KG' AS "PMM",
+'EGR.ID'                                  AS "CLASE",
+'REC.ID'                                  AS "CODIGO STATUS CAJA",
+'TO_CHAR(UFV.TIME_IN,'YYYY-MM-DD HH24:MI')' AS "F.ENTRADA STOCK",  --"TIME IN",
+'TRUNC(NVL(TRUNC(UFV.TIME_OUT),CURRENT_DATE) - TRUNC(UFV.TIME_IN))' AS "DIAS ENTRADAS STOCK",
+'TO_CHAR(RE.BUILD_DATE,'YYYY-MM-DD HH24:MI')' AS "FECHA FABRICACION",
+'U.CUSTDFF_FLEX_STRING12   '                  AS "MOTIVO BLOQUEO",
+'BKG.NBR       '                              AS NUMEROBOOKING,
+'U.FLEX_STRING03  '                           AS "COSTO / FECHA APROBACION",
+'TO_CHAR(U.CUSTDFF_FLEX_DATE03 ,'YYYY-MM-DD HH24:MI')' AS "FECHA FIN REPARACION",
+'U.REMARK '                                   AS "NOTAS1",
+'U.CUSTDFF_FLEX_STRING11 '                    AS "NOTAS2"
+
+FROM INV_UNIT U
+INNER JOIN INV_UNIT_FCY_VISIT UFV     ON U.GKEY = UFV.UNIT_GKEY
+LEFT OUTER JOIN REF_EQUIPMENT RE ON U.ID = RE.ID_FULL
+LEFT OUTER JOIN REF_EQUIP_TYPE RET  ON RET.GKEY =RE.EQTYP_GKEY
+LEFT OUTER JOIN REF_EQUIP_CONDITIONS REC ON REC.GKEY = U.CONDITION_GKEY
+LEFT OUTER JOIN ORD_EQUIPMENT_ORDER_ITEMS     ITEM        ON U.DEPART_ORDER_ITEM_GKEY = ITEM.GKEY
+LEFT OUTER JOIN INV_EQ_BASE_ORDER_ITEM        BASEITEM    ON BASEITEM.GKEY = ITEM.GKEY
+LEFT OUTER JOIN INV_EQ_BASE_ORDER             BKG         ON BASEITEM.EQO_GKEY = BKG.GKEY
+LEFT OUTER JOIN REF_EQUIP_GRADES              EGR         ON EGR.GKEY = ITEM.EQ_GRADE_GKEY
+
+WHERE
+U.COMPLEX_GKEY = 3575349411
+AND UFV.TIME_IN < TO_DATE($P{fechaETAFin},'YYYY/MM/DD HH24:MI')
+AND UFV.TIME_IN > TO_DATE($P{fechaETAInicio},'YYYY/MM/DD HH24:MI');]]>
+	</queryString>
+	<field name="EQUIPAMIENTO" class="java.lang.String"/>
+	<field name="TIPO" class="java.lang.String"/>
+	<field name="TAMAÑO" class="java.lang.String"/>
+	<field name="TARA" class="java.lang.String"/>
+	<field name="PMM" class="java.lang.Long"/>
+	<field name="Clase" class="java.lang.String"/>
+	<field name="Codigo Status Caja" class="java.lang.String"/>
+	<field name="F.Entrada Stock" class="java.lang.String"/>
+	<field name="Dias Entradas Stock" class="java.lang.Long"/>
+	<field name="FECHA FABRICACION" class="java.lang.String"/>
+	<field name="Motivo Bloqueo" class="java.lang.String"/>
+	<field name="NumeroBooking" class="java.lang.String"/>
+	<field name="Costo / Fecha AProbacion" class="java.lang.String"/>
+	<field name="Fecha Fin reparacion" class="java.lang.String"/>
+	<field name="Notas1" class="java.lang.String"/>
+	<field name="Notas2" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="2" width="100" height="20" uuid="0ec5ad67-401a-46d7-8d3b-d72fb1dacf62"/>
+				<text><![CDATA[EQUIPAMIENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="2" width="100" height="20" uuid="61539c15-9283-4fcc-956c-5fb0390ed5c9"/>
+				<text><![CDATA[TIPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="2" width="100" height="20" uuid="3aed2cfb-f747-4c15-bf19-06e0b58c6948"/>
+				<text><![CDATA[TAMAÑO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="2" width="100" height="20" uuid="8c5bf780-49ca-43e5-91f4-f18e58d9fccf"/>
+				<text><![CDATA[TARA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="2" width="100" height="20" uuid="2f5e79e7-8222-4094-8589-5d54c39b472f"/>
+				<text><![CDATA[PMM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="2" width="100" height="20" uuid="cdd5da24-1f85-462b-a4cb-135ea96627b2"/>
+				<text><![CDATA[Clase]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="2" width="100" height="20" uuid="c5256cf7-98cf-4c11-9dcb-e27f2472c707"/>
+				<text><![CDATA[Codigo Status Caja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="708" y="2" width="100" height="20" uuid="fa119618-20bb-4334-847d-379caa05673e"/>
+				<text><![CDATA[F.Entrada Stock]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="816" y="2" width="100" height="20" uuid="30b6a390-c514-4482-a1ec-0ab2c45d6eaf"/>
+				<text><![CDATA[Dias Entradas Stock]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="927" y="2" width="100" height="20" uuid="71453a9c-2a3c-4704-b778-2009758f7b06"/>
+				<text><![CDATA[FECHA FABRICACION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1039" y="2" width="100" height="20" uuid="e179db2e-83dd-47d1-9c48-650c827a7238"/>
+				<text><![CDATA[Motivo Bloqueo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1147" y="2" width="100" height="20" uuid="37820567-4f76-478f-8def-ab0c374a7af5"/>
+				<text><![CDATA[NumeroBooking]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1254" y="2" width="100" height="20" uuid="7a43f352-8439-4206-b59b-1b8bf6eb2f1e"/>
+				<text><![CDATA[Costo / Fecha AProbacion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1358" y="2" width="100" height="20" uuid="b4a26f04-4359-4348-ab39-a4f860adf44b"/>
+				<text><![CDATA[Fecha Fin reparacion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1467" y="2" width="100" height="20" uuid="74f260b6-e336-4370-8a1d-7692b6946381"/>
+				<text><![CDATA[Notas1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1572" y="2" width="100" height="20" uuid="aa1e7202-a052-4904-817a-5999360d7de0"/>
+				<text><![CDATA[Notas2]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="57" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="7" width="100" height="20" uuid="cbf7f3f4-838a-4dfb-ab47-da8076d8f323"/>
+				<textFieldExpression><![CDATA[$F{EQUIPAMIENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="7" width="100" height="20" uuid="3f4b224f-e8da-4add-a4c7-3233e45f2fcc"/>
+				<textFieldExpression><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="7" width="100" height="20" uuid="c7ff9ce9-d5af-4da4-ba3e-ebde50c58c1d"/>
+				<textFieldExpression><![CDATA[$F{TAMAÑO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="7" width="100" height="20" uuid="7c097331-1785-4d79-ba6c-3360814940e9"/>
+				<textFieldExpression><![CDATA[$F{TARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="7" width="100" height="20" uuid="5b3ca042-50f1-4d8c-88d1-98ff94c19bfd"/>
+				<textFieldExpression><![CDATA[$F{PMM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="7" width="100" height="20" uuid="239c27e4-3024-45ff-8975-4622310a973a"/>
+				<textFieldExpression><![CDATA[$F{Clase}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="600" y="7" width="100" height="20" uuid="7b7315e0-d387-4506-a38c-22fb730b8f36"/>
+				<textFieldExpression><![CDATA[$F{Codigo Status Caja}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="708" y="7" width="100" height="20" uuid="1fcbbe17-c9b4-4f5d-a343-52fbaf57f3c3"/>
+				<textFieldExpression><![CDATA[$F{F.Entrada Stock}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="816" y="7" width="100" height="20" uuid="02976851-c00e-4f04-8271-c728628b68c0"/>
+				<textFieldExpression><![CDATA[$F{Dias Entradas Stock}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="927" y="7" width="100" height="20" uuid="179abfa1-2f82-4d0b-9e30-507102905477"/>
+				<textFieldExpression><![CDATA[$F{FECHA FABRICACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1039" y="7" width="100" height="20" uuid="42ee9970-0319-4e99-814d-fac1a287da18"/>
+				<textFieldExpression><![CDATA[$F{Motivo Bloqueo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1147" y="7" width="100" height="20" uuid="fca3d9dc-918e-4b0d-972d-1fc2104a2878"/>
+				<textFieldExpression><![CDATA[$F{NumeroBooking}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1254" y="7" width="100" height="20" uuid="141a1a20-7c3e-4452-9496-ca56c7eb76d4"/>
+				<textFieldExpression><![CDATA[$F{Costo / Fecha AProbacion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1358" y="7" width="100" height="20" uuid="9576d728-e79c-4ccd-9879-67cf97b80e69"/>
+				<textFieldExpression><![CDATA[$F{Fecha Fin reparacion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1467" y="7" width="100" height="20" uuid="9d462ca6-a316-4f56-818c-4c104a624ea7"/>
+				<textFieldExpression><![CDATA[$F{Notas1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1572" y="7" width="100" height="20" uuid="9e3bb9bd-fa53-4151-b4a0-be845249269d"/>
+				<textFieldExpression><![CDATA[$F{Notas2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

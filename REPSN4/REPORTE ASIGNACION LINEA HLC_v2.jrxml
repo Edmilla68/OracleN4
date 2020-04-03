@@ -7,7 +7,7 @@
 	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
-	<property name="ireport.x" value="2335"/>
+	<property name="ireport.x" value="2211"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="fechaETAInicio" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
