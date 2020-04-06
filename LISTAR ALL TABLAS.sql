@@ -6,4 +6,13 @@ AND table_name LIKE '%CARR%'
 ORDER BY table_name;
 
 
+--LISTAR TODAS LAS COLUMNAS
+select * from all_tab_columns
+where Owner = 'USRTOSN4P' and column_name like '%GRADE_ID%'
+;
+
+
+
+
+
 
