@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="568dfa1d-d87f-4f22-965c-6c03a6d96479">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1" whenResourceMissingType="Empty" uuid="08b3fbd2-cc85-43a7-90f5-53be4d74cbf2">
+		<field name="field_1" class="java.lang.String">
+			<fieldDescription><![CDATA[@type]]></fieldDescription>
+		</field>
+		<field name="field_2" class="java.lang.String">
+			<fieldDescription><![CDATA[child::text()]]></fieldDescription>
+		</field>
+	</subDataset>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="130" splitType="Stretch">
+			<staticText>
+				<reportElement x="25" y="2" width="100" height="20" uuid="82990860-f797-47cf-a242-ad9bc56b4d1b"/>
+				<text><![CDATA[@type]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="190" splitType="Stretch">
+			<componentElement>
+				<reportElement x="266" y="92" width="275" height="77" uuid="2dfd8124-9e7d-43b9-a638-e0932f31c8a8"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dataset1" uuid="4f220c20-def6-4607-bcc3-19f66e4c9c2e">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("/person/phone")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="77" width="275">
+						<textField>
+							<reportElement x="21" y="19" width="100" height="20" uuid="abaab4a7-7907-47af-9bdb-e85e2d7a066c"/>
+							<textFieldExpression><![CDATA[$F{field_1}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="150" y="19" width="100" height="20" uuid="4616225e-92d9-406b-a377-9981a2798768"/>
+							<textFieldExpression><![CDATA[$F{field_2}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
