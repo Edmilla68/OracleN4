@@ -1,4 +1,5 @@
-SELECT u.id,
+SELECT 
+u.id,
 SRV.placed_time,
 SRV.placed_by,
  (SELECT LISTAGG(NVL(prior_value,'(null)') ||' -> ' ||new_value, ', ') WITHIN GROUP (ORDER BY event_gkey)  "Changes"
@@ -20,7 +21,10 @@ LEFT JOIN USRTOSN4P.INV_GOODS GD            ON CRG.GOODS_GKEY = GD.GKEY
 LEFT  JOIN USRTOSN4P.CRG_BL_GOODS CBD        ON CBD.GDS_GKEY = GD.GKEY
 INNER  JOIN USRTOSN4P.CRG_BILLS_OF_LADING BL  ON CBD.BL_GKEY = BL.GKEY
 INNER JOIN USRTOSN4P.argo_carrier_visit argcv ON BL.CV_GKEY = argcv.GKEY
-WHERE SRV.placed_time >= TO_DATE('2019-12-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ;
+WHERE SRV.placed_time >= TO_DATE('2020-03-11 00:00:00', 'YYYY-MM-DD HH24:MI:SS') and
+SRV.placed_time <= TO_DATE('2020-04-17 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ;
+
+
 
 --WHERE CRG.ID LIKE '66764727-1-6'
 --order by 2 desc;

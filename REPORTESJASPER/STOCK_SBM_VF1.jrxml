@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="STOCK SBM" language="groovy" pageWidth="2520" pageHeight="1000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2480" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85b9ba55-9940-4f51-a6dc-78dd50509b58">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="FACILITY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[/*============== STOCK  SBM==============================*/
+SELECT
+DISTINCT
+U.ID                                    AS "EQUIPAMIENTO",
+SUBSTR(ARQ.id,3,2)                          AS "TIPO",
+SUBSTR(ARQ.id,1,2)                          AS "TAMAÑO",
+re.tare_kg                              AS "TARA",
+re.safe_kg - re.tare_kg        AS "PMM",
+egr.ID                                  AS "CLASE",
+REC.ID                                  AS "CODIGO STATUS CAJA",
+TO_CHAR(ufv.TIME_IN,'YYYY-MM-DD HH24:MI') AS "F ENTRADA STOCK" ,
+TRUNC(NVL(TRUNC(ufv.time_out),CURRENT_DATE) - TRUNC(ufv.time_in)) as "DIAS ENTRADA STOCK",
+RE.build_date                               as "FECHA FABRICACION",
+u.custdff_flex_string12                     AS "MOTIVO BLOQUEO",
+NVL(u.custdff_flex_string14,EQBO.NBR)       AS "BOOKING RESERVA PTE",
+SUBSTR(CUSTDFF_FLEX_STRING15,LENGTH(CUSTDFF_FLEX_STRING15) - 8, LENGTH(CUSTDFF_FLEX_STRING15))  AS "FECHA ACEPTACION CAJA",
+u.CUSTDFF_FLEX_DATE03                       AS "FECHA FIN REPARACION CAJA",
+U.remark                                    as "NOTAS",
+u.custdff_flex_string11                     as "NOTA2",
+BS.ID AS "LINEA",
+SUBSTR(CUSTDFF_FLEX_STRING15,1, LENGTH(CUSTDFF_FLEX_STRING15) - 10) AS "TOTAL CAJA",
+CASE WHEN B.NBR IS NOT NULL THEN VSC2.ID WHEN EQBO.NBR IS NOT NULL THEN VSC.ID  END             AS "ID BUQUE",
+CASE WHEN B.NBR IS NOT NULL THEN VSD2.OB_VYG WHEN EQBO.NBR IS NOT NULL THEN VVD.OB_VYG END      AS "VIAJE",
+CASE WHEN B.NBR IS NOT NULL THEN TO_CHAR(VSD2.PUBLISHED_ETA,'DD/MM/YYYY') WHEN EQBO.NBR IS NOT NULL THEN TO_CHAR(VVD.PUBLISHED_ETA,'DD/MM/YYYY')  END AS "FECHA ETA",
+CASE WHEN U.FLEX_STRING08 = 'A' THEN 'APERTURA'
+     WHEN U.FLEX_STRING08 = 'D' THEN 'DESCARGA'
+     WHEN U.FLEX_STRING08 = 'E' THEN 'DEVOLUCIO EXP'
+     WHEN U.FLEX_STRING08 = 'M' THEN 'MANUALES'
+     WHEN U.FLEX_STRING08 = 'P' THEN 'PARTICULARES'  END                                        AS "TIPO ENTRADA"
+FROM INV_UNIT U
+LEFT OUTER JOIN INV_UNIT_FCY_VISIT UFV        ON U.GKEY = UFV.UNIT_GKEY
+LEFT OUTER JOIN REF_BIZUNIT_SCOPED BS        ON U.LINE_OP = BS.GKEY  AND BS.ROLE = 'LINEOP'
+LEFT OUTER JOIN INV_EQ_BASE_ORDER_ITEM EQBOI on U.DEPART_ORDER_ITEM_GKEY = EQBOI.GKEY
+LEFT OUTER JOIN INV_EQ_BASE_ORDER EQBO on EQBO.GKEY = EQBOI.EQO_GKEY AND EQBO.SUB_TYPE = 'EDO'
+LEFT OUTER JOIN REF_EQUIPMENT RE             ON U.ID = RE.ID_FULL
+LEFT OUTER JOIN REF_EQUIP_TYPE RET           ON RET.GKEY =RE.EQTYP_GKEY
+LEFT OUTER JOIN REF_EQUIP_TYPE ARQ           ON ARQ.GKEY = RET.ARCHETYPE
+LEFT OUTER JOIN ARGO_CARRIER_VISIT CV        ON CV.GKEY = EQBO.VESSEL_VISIT_GKEY
+LEFT OUTER JOIN VSL_VESSEL_VISIT_DETAILS VVD ON VVD.VVD_GKEY = CV.CVCVD_GKEY
+LEFT OUTER JOIN VSL_VESSELS VS               ON VS.GKEY = VVD.VESSEL_GKEY
+LEFT OUTER JOIN SRV_EVENT EV                 ON EV.APPLIED_TO_GKEY = EQBO.GKEY
+LEFT OUTER JOIN REF_BIZUNIT_SCOPED BSA       ON BSA.GKEY = EQBO.AGENT_GKEY AND BSA.ROLE = 'AGENT'
+LEFT OUTER JOIN REF_ROUTING_POINT RP         ON RP.GKEY =  EQBO.CUSTDFF_EDO_FLEX_STRING20
+LEFT OUTER JOIN REF_EQUIP_CONDITIONS REC ON REC.GKEY = U.CONDITION_GKEY
+LEFT OUTER JOIN USRTOSN4P.ORD_EQUIPMENT_ORDER_ITEMS     ITEM        ON U.DEPART_ORDER_ITEM_GKEY = ITEM.GKEY
+LEFT OUTER JOIN USRTOSN4P.REF_EQUIP_GRADES              EGR         ON EGR.gkey = U.GRADE_GKEY
+LEFT OUTER JOIN USRTOSN4P.ARGO_FACILITY                 AF          ON AF.GKEY = UFV.FCY_GKEY
+LEFT OUTER JOIN     VSL_VESSEL_CLASSES            VSC     ON VSC.GKEY = VS.VESCLASS_GKEY
+LEFT OUTER JOIN     INV_GOODS                         T           ON  T.GKEY  = U.GOODS
+LEFT OUTER JOIN     CRG_BL_GOODS                      BG          ON  T.GKEY  = BG.GDS_GKEY
+LEFT OUTER JOIN     CRG_BILLS_OF_LADING               B           ON  BG.BL_GKEY = B.GKEY
+LEFT JOIN 	ARGO_CARRIER_VISIT       ACV2 ON ACV2.GKEY = B.CV_GKEY
+LEFT JOIN 	VSL_VESSEL_VISIT_DETAILS VSD2 ON ACV2.CVCVD_GKEY = VSD2.VVD_GKEY
+LEFT JOIN 	VSL_VESSELS              VS2  ON VS2.GKEY =VSD2.VESSEL_GKEY
+LEFT JOIN 	VSL_VESSEL_CLASSES       VSC2 ON VSC2.GKEY = VS2.VESCLASS_GKEY
+LEFT OUTER JOIN     ARGO_CARRIER_VISIT       ACV2 ON ACV2.GKEY = B.CV_GKEY
+LEFT OUTER JOIN     VSL_VESSEL_VISIT_DETAILS VSD2 ON ACV2.CVCVD_GKEY = VSD2.VVD_GKEY
+LEFT OUTER JOIN     VSL_VESSELS              VS2  ON VS2.GKEY =VSD2.VESSEL_GKEY
+LEFT OUTER JOIN     VSL_VESSEL_CLASSES       VSC2 ON VSC2.GKEY = VS2.VESCLASS_GKEY
+WHERE  BS.ID='SBM'
+AND UFV.TRANSIT_STATE LIKE '%YARD%'
+AND U.FREIGHT_KIND = 'MTY'
+AND AF.ID = $P{FACILITY}]]>
+	</queryString>
+	<field name="EQUIPAMIENTO" class="java.lang.String"/>
+	<field name="TIPO" class="java.lang.String"/>
+	<field name="TAMAÑO" class="java.lang.String"/>
+	<field name="TARA" class="java.lang.String"/>
+	<field name="PMM" class="java.lang.String"/>
+	<field name="CLASE" class="java.lang.String"/>
+	<field name="CODIGO STATUS CAJA" class="java.lang.String"/>
+	<field name="F ENTRADA STOCK" class="java.lang.String"/>
+	<field name="DIAS ENTRADA STOCK" class="java.lang.String"/>
+	<field name="FECHA FABRICACION" class="java.lang.String"/>
+	<field name="MOTIVO BLOQUEO" class="java.lang.String"/>
+	<field name="BOOKING RESERVA PTE" class="java.lang.String"/>
+	<field name="FECHA ACEPTACION CAJA" class="java.lang.String"/>
+	<field name="FECHA FIN REPARACION CAJA" class="java.lang.String"/>
+	<field name="NOTAS" class="java.lang.String"/>
+	<field name="NOTA2" class="java.lang.String"/>
+	<field name="LINEA" class="java.lang.String"/>
+	<field name="TOTAL CAJA" class="java.lang.String"/>
+	<field name="ID BUQUE" class="java.lang.String"/>
+	<field name="VIAJE" class="java.lang.String"/>
+	<field name="FECHA ETA" class="java.lang.String"/>
+	<field name="TIPO ENTRADA" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="27" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="2" width="124" height="20" uuid="add01b78-4b82-4f0b-a28c-eb66cbb30fa2"/>
+				<text><![CDATA[EQUIPAMIENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="228" y="2" width="100" height="20" uuid="1d0975dc-abec-4946-b963-f64a40216256"/>
+				<text><![CDATA[TIPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="2" width="100" height="20" uuid="feffac83-b360-414e-afd7-eb3491332618"/>
+				<text><![CDATA[CLASE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="677" y="2" width="132" height="20" uuid="4f1f9dde-0017-4091-bdf2-d5df0a2e1460"/>
+				<text><![CDATA[FECHA FABRICACION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1945" y="2" width="100" height="20" uuid="5a4fe58a-95c7-4e8b-8824-d54cd2bad031"/>
+				<text><![CDATA[TOTAL CAJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1621" y="2" width="152" height="20" uuid="a13442dd-284d-49e7-86d6-065765610f0a"/>
+				<text><![CDATA[FECHA ACEPTACION CAJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1773" y="2" width="170" height="20" uuid="a65637b2-235f-4ab1-8746-46ebee7084c1"/>
+				<text><![CDATA[FECHA FIN REPARACION CAJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="2" width="100" height="20" uuid="6bacffe9-73d0-4828-990e-55b0c2f28cb0"/>
+				<text><![CDATA[TAMAÑO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="2" width="137" height="20" uuid="4d57d3ba-4299-42de-ae07-bf0ad23c5e64"/>
+				<text><![CDATA[TARA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="577" y="2" width="100" height="20" uuid="638001e2-ae72-4714-b592-8ac3530bec0b"/>
+				<text><![CDATA[PMM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1226" y="2" width="138" height="20" uuid="81985812-1aa8-45d7-8eb1-4dfb1784327f"/>
+				<text><![CDATA[F ENTRADA STOCK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1364" y="2" width="133" height="20" uuid="9203ae1d-2009-4673-80ff-3c85a9830a9c"/>
+				<text><![CDATA[DIAS ENTRADA STOCK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1499" y="2" width="122" height="20" uuid="4f1c8626-2d86-4738-9ff3-55339300de6f"/>
+				<text><![CDATA[CODIGO STATUS CAJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2171" y="2" width="218" height="20" uuid="a458a7d2-16fb-492d-9dc4-e692981e2a2b"/>
+				<text><![CDATA[BOOKING RESERVA PTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2045" y="2" width="126" height="20" uuid="6449f941-6f53-42ba-a91d-ba41e64060f2"/>
+				<text><![CDATA[MOTIVO BLOQUEO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="918" y="2" width="100" height="20" uuid="8f9c906b-de45-493a-a582-4eda937805eb"/>
+				<text><![CDATA[ID BUQUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1022" y="2" width="100" height="20" uuid="ffb6481a-6ffd-4087-ba2e-85ef534226e1"/>
+				<text><![CDATA[VIAJE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="812" y="2" width="100" height="20" uuid="a6957750-8848-47a7-986d-c9c2f1d15c9a"/>
+				<text><![CDATA[FECHA ETA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1126" y="2" width="100" height="20" uuid="6507c2c1-4b61-41ce-9cc5-3f7a0833864e"/>
+				<text><![CDATA[TIPO ENTRADA]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="4" width="124" height="20" uuid="571e0779-8194-452a-b38f-6c88c86eb9d9"/>
+				<textFieldExpression><![CDATA[$F{EQUIPAMIENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="228" y="4" width="100" height="20" uuid="30d3e68e-4f48-46f4-bfc0-9a96c55410c6"/>
+				<textFieldExpression><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="124" y="4" width="100" height="20" uuid="0202a757-c840-4e68-b348-32c765b36067"/>
+				<textFieldExpression><![CDATA[$F{TAMAÑO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="430" y="4" width="137" height="20" uuid="79c41cf0-b712-43a6-941c-74c69339201f"/>
+				<textFieldExpression><![CDATA[$F{TARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="577" y="4" width="100" height="20" uuid="18dc0836-57c1-4e6d-a436-cff54d730c85"/>
+				<textFieldExpression><![CDATA[$F{PMM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="4" width="100" height="20" uuid="a016ae06-bee3-4a06-ac0e-613a3d51a6d2"/>
+				<textFieldExpression><![CDATA[$F{CLASE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1499" y="4" width="122" height="20" uuid="fc98612c-5e45-4197-861c-e62e5de35ee2"/>
+				<textFieldExpression><![CDATA[$F{CODIGO STATUS CAJA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1226" y="4" width="138" height="20" uuid="dbf34d6f-3de5-45f9-9fc0-745146194280"/>
+				<textFieldExpression><![CDATA[$F{F ENTRADA STOCK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1364" y="4" width="133" height="20" uuid="fe8ead1b-5e99-429f-adb8-2d407c9ac02e"/>
+				<textFieldExpression><![CDATA[$F{DIAS ENTRADA STOCK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="677" y="4" width="132" height="20" uuid="edcf35b8-fac7-42ff-8b19-9184f633be20"/>
+				<textFieldExpression><![CDATA[$F{FECHA FABRICACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2045" y="4" width="126" height="20" uuid="73988707-fc0a-4fcb-9995-2e99bc13bfeb"/>
+				<textFieldExpression><![CDATA[$F{MOTIVO BLOQUEO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1945" y="4" width="100" height="20" uuid="3fcd1742-9f3b-40d4-97e5-7b177543c247"/>
+				<textFieldExpression><![CDATA[$F{TOTAL CAJA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1621" y="4" width="152" height="20" uuid="94562716-9692-46a9-8537-f44116ff94e2"/>
+				<textFieldExpression><![CDATA[$F{FECHA ACEPTACION CAJA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2171" y="4" width="218" height="20" uuid="338cd420-fdcd-412b-b186-6317461e913f"/>
+				<textFieldExpression><![CDATA[$F{BOOKING RESERVA PTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1773" y="4" width="170" height="20" uuid="53026fce-4465-4ebd-8d29-ada147d74360"/>
+				<textFieldExpression><![CDATA[$F{FECHA FIN REPARACION CAJA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="918" y="4" width="100" height="20" uuid="a67a3fbf-4fd5-4dfd-9b2b-c6835fb35d68"/>
+				<textFieldExpression><![CDATA[$F{ID BUQUE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1022" y="4" width="100" height="20" uuid="e1010b35-e49d-4d41-be59-e5e7b8427957"/>
+				<textFieldExpression><![CDATA[$F{VIAJE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="812" y="4" width="100" height="20" uuid="2d131919-4e6d-4287-9615-b0904c63e632"/>
+				<textFieldExpression><![CDATA[$F{FECHA ETA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1126" y="4" width="100" height="20" uuid="bf8ae1b3-4e42-446f-9033-7ad012671bad"/>
+				<textFieldExpression><![CDATA[$F{TIPO ENTRADA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

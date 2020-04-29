@@ -57,9 +57,7 @@ WHERE
 		BS.ID='WHL'
 		AND UFV.TRANSIT_STATE LIKE '%YARD%'
 		AND U.FREIGHT_KIND = 'MTY'
-		AND AF.ID = $P{FACILITY}
-
-]]>
+		AND AF.ID = $P{FACILITY}]]>
 	</queryString>
 	<field name="EQUIPAMIENTO" class="java.lang.String"/>
 	<field name="TAMAÑO" class="java.lang.String"/>

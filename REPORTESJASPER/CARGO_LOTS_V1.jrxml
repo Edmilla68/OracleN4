@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="STOCK PIL" language="groovy" pageWidth="2520" pageHeight="1000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2480" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85b9ba55-9940-4f51-a6dc-78dd50509b58">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="FechaInicio" class="java.lang.String"/>
+	<parameter name="FechaFinal" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+ID,
+PLACED_TIME,
+PLACED_BY,
+LISTAGG(NVL(PRIORVALUE,'(null)') ||' -> ' ||NEWVALUE, ', ') WITHIN GROUP (ORDER BY PRIORVALUE)  as "CHANGES",
+"BL NBR",
+"VES VISIT",
+"QTY",
+"TX NBR",
+"LPN",
+"VOLUMEN",
+"PESO REFRENDO",
+"CONSOLIDADOR"
+FROM
+(
+SELECT DISTINCT
+U.ID                                AS ID,
+SRV.PLACED_TIME                     AS PLACED_TIME,
+SRV.PLACED_BY                       AS PLACED_BY,
+GD.BL_NBR                           AS "BL NBR",
+argcv.ID                            AS "VES VISIT",
+CRG.QUANTITY                        AS "QTY",
+CRG.custdff_flex_long_01            AS "TX NBR",
+CRG.CUSTDFF_LOT_FLEX_STRING03       AS "LPN",
+CRG.CUSTDFF_FLEX_DOUBLE_03          AS "VOLUMEN",
+CRG.CUSTDFF_FLEX_DOUBLE_02          AS "PESO REFRENDO",
+BL.CUSTDFF_BL_FLEX_STRING08         AS "CONSOLIDADOR",
+SRV.GKEY                            AS "SRV_GKEY",
+efch.prior_value                    AS "PRIORVALUE",
+efch.new_value                      AS "NEWVALUE"
+FROM        CRG_LOTS CRG
+INNER JOIN  INV_UNIT U                ON U.GOODS = CRG.GOODS_GKEY
+INNER JOIN  SRV_EVENT SRV             ON SRV.APPLIED_TO_GKEY = U.GKEY OR SRV.APPLIED_TO_GKEY = CRG.GKEY
+INNER JOIN  SRV_EVENT_TYPES SRVT      ON SRVT.GKEY = SRV.EVENT_TYPE_GKEY
+LEFT  JOIN  INV_GOODS GD              ON CRG.GOODS_GKEY = GD.GKEY
+LEFT  JOIN  CRG_BL_GOODS CBD          ON CBD.GDS_GKEY = GD.GKEY
+INNER JOIN  CRG_BILLS_OF_LADING BL    ON CBD.BL_GKEY = BL.GKEY
+INNER JOIN  ARGO_CARRIER_VISIT ARGCV  ON BL.CV_GKEY = ARGCV .GKEY
+LEFT OUTER JOIN SRV_EVENT_FIELD_CHANGES EFCH on efch.event_gkey = SRV.GKEY
+WHERE
+SRV.PLACED_TIME < TO_DATE($P{FechaFinal},'YYYY/MM/DD HH24:MI') AND
+SRV.PLACED_TIME > TO_DATE($P{FechaInicio},'YYYY/MM/DD HH24:MI')
+
+)ZZZ
+
+GROUP BY
+
+ID,
+PLACED_TIME,
+PLACED_BY,
+"BL NBR",
+"VES VISIT",
+"QTY",
+"TX NBR",
+"LPN",
+"VOLUMEN",
+"PESO REFRENDO",
+"CONSOLIDADOR",
+"SRV_GKEY",
+PRIORVALUE,
+NEWVALUE]]>
+	</queryString>
+	<field name="ID" class="java.lang.String"/>
+	<field name="PLACED_TIME" class="java.lang.String"/>
+	<field name="PLACED_BY" class="java.lang.String"/>
+	<field name="CHANGES" class="java.lang.String"/>
+	<field name="BL NBR" class="java.lang.String"/>
+	<field name="VES VISIT" class="java.lang.String"/>
+	<field name="QTY" class="java.lang.String"/>
+	<field name="TX NBR" class="java.lang.String"/>
+	<field name="LPN" class="java.lang.String"/>
+	<field name="VOLUMEN" class="java.lang.String"/>
+	<field name="PESO REFRENDO" class="java.lang.String"/>
+	<field name="CONSOLIDADOR" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="27" splitType="Stretch">
+			<staticText>
+				<reportElement x="118" y="2" width="100" height="20" uuid="8070464f-d3a1-440e-9bfa-38bad16a9ac1"/>
+				<text><![CDATA[PLACED_TIME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="2" width="100" height="20" uuid="b57fae52-3276-406b-91ce-1e0b367b958e"/>
+				<text><![CDATA[PLACED_BY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="2" width="100" height="20" uuid="847c7cf8-208d-4688-8fc1-b5d139d932cb"/>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="2" width="100" height="20" uuid="ce16d097-9452-4675-a99d-5fb25d0bdf47"/>
+				<text><![CDATA[CHANGES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="434" y="2" width="100" height="20" uuid="29f83d04-bedc-4356-819b-8e6979bf6839"/>
+				<text><![CDATA[BL NBR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="2" width="100" height="20" uuid="2b0bceb8-4038-4a37-b6f3-87f297c8b628"/>
+				<text><![CDATA[VES VISIT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="648" y="2" width="100" height="20" uuid="8d591d3e-ead8-4e9c-898d-eba39d6fdb5a"/>
+				<text><![CDATA[QTY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="755" y="2" width="100" height="20" uuid="096398ea-095b-4012-9120-e6acbef1ddc3"/>
+				<text><![CDATA[TX NBR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="864" y="2" width="100" height="20" uuid="b149c0a0-3492-4645-8a36-eedfbcecbfaa"/>
+				<text><![CDATA[LPN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="972" y="2" width="100" height="20" uuid="2d98f95e-5722-455a-b1bb-8ba7a3e10c24"/>
+				<text><![CDATA[VOLUMEN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1079" y="2" width="100" height="20" uuid="c7c6829d-d566-41b5-9a18-bbeabdd1ae46"/>
+				<text><![CDATA[PESO REFRENDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1190" y="2" width="100" height="20" uuid="579f2392-0e7e-4403-bf64-75160b40a5f0"/>
+				<text><![CDATA[CONSOLIDADOR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<textField>
+				<reportElement x="118" y="5" width="100" height="20" uuid="747f44df-7cc9-44e2-898a-6f1f934905c3"/>
+				<textFieldExpression><![CDATA[$F{PLACED_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="223" y="5" width="100" height="20" uuid="6ae3221b-04b1-44d3-a435-78d1c76645a1"/>
+				<textFieldExpression><![CDATA[$F{PLACED_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="11" y="5" width="100" height="20" uuid="4cf59452-6d32-4915-947f-258310871c12"/>
+				<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="5" width="100" height="20" uuid="d14968b6-cb12-4789-95e0-086b8e394f3a"/>
+				<textFieldExpression><![CDATA[$F{CHANGES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="434" y="5" width="100" height="20" uuid="8749c11d-eab5-44d1-bfdb-08ca3f81a12d"/>
+				<textFieldExpression><![CDATA[$F{BL NBR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="540" y="5" width="100" height="20" uuid="c5c39308-f5f5-480f-9840-3502721cd468"/>
+				<textFieldExpression><![CDATA[$F{VES VISIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="648" y="5" width="100" height="20" uuid="e96a7356-a43a-4f25-a51d-b4628f8f6d1c"/>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="755" y="5" width="100" height="20" uuid="fb114923-de9a-449e-b9cc-bf5ff2754801"/>
+				<textFieldExpression><![CDATA[$F{TX NBR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="864" y="5" width="100" height="20" uuid="037df620-074a-4b5b-b859-bc1acc598559"/>
+				<textFieldExpression><![CDATA[$F{LPN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="972" y="5" width="100" height="20" uuid="7ff45e13-2b81-4524-8cce-70dcada6d9b1"/>
+				<textFieldExpression><![CDATA[$F{VOLUMEN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1079" y="5" width="100" height="20" uuid="7388f6da-0608-4e26-9fb8-94ae14be7197"/>
+				<textFieldExpression><![CDATA[$F{PESO REFRENDO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1190" y="5" width="100" height="20" uuid="ca7162ae-7c49-41b6-ba02-369bab0bf44d"/>
+				<textFieldExpression><![CDATA[$F{CONSOLIDADOR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

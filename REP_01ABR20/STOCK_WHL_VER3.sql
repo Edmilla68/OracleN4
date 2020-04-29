@@ -14,22 +14,31 @@ SUBSTR(CUSTDFF_FLEX_STRING15,LENGTH(CUSTDFF_FLEX_STRING15) - 8, LENGTH(CUSTDFF_F
 u.CUSTDFF_FLEX_DATE03                       AS "FECHA FIN REPARACION CAJA",
 SUBSTR(CUSTDFF_FLEX_STRING15,1, LENGTH(CUSTDFF_FLEX_STRING15) - 10) 							AS "TOTAL CAJA",
 
-NVL(u.custdff_flex_string14,EQBO.NBR)       													AS "BOOKING RESERVA PTE",
-VSC.ID                                                                                          AS "ID BUQUE",
-VVD.OB_VYG                                                                                      AS "VIAJE",
+NVL(u.custdff_flex_string14,EQBO.NBR) AS "BOOKING RESERVA PTE NN",
+
+--CASE WHEN B.NBR IS NOT NULL THEN VSC2.ID WHEN EQBO.NBR IS NOT NULL THEN VSC.ID  END             AS "ID BUQUE",
+--CASE WHEN B.NBR IS NOT NULL THEN VSD2.OB_VYG WHEN EQBO.NBR IS NOT NULL THEN VVD.OB_VYG END      AS "VIAJE",
 u.custdff_flex_string12                     													AS "MOTIVO BLOQUEO",
-U.remark                                    													AS "NOTAS"
+U.remark                                    													AS "NOTAS",
+--*******************************************************************************
+CASE WHEN B.NBR IS NOT NULL THEN VSC2.ID WHEN EQBO2.NBR IS NOT NULL THEN VSC.ID  END             AS "ID BUQUE",
+CASE WHEN B.NBR IS NOT NULL THEN VSD2.OB_VYG WHEN EQBO2.NBR IS NOT NULL THEN VVD.OB_VYG END      AS "VIAJE",
+B.NBR AS BL_NBR,
+EQBO.NBR AS BOOKNUMBER,
+EQBO2.NBR AS ARRBOOKNUMBER,
+U.ARRIVE_ORDER_ITEM_GKEY
+--U.ARRIVE_ORDER_ITEM_GKEY AS ARRUNIT,
+--(SELECT NBR FROM USRTOSN4P.INV_EQ_BASE_ORDER WHERE SUB_TYPE = 'ERO' AND GKEY = U.ARRIVE_ORDER_ITEM_GKEY)  AS "ARREXP"
 
-
-
-FROM   	            USRTOSN4P.INV_UNIT 						U
+FROM   	USRTOSN4P.INV_UNIT 						U
 LEFT OUTER JOIN 	USRTOSN4P.INV_UNIT_FCY_VISIT 			UFV     ON U.GKEY = UFV.UNIT_GKEY
 LEFT OUTER JOIN 	USRTOSN4P.REF_BIZUNIT_SCOPED 			BS      ON U.LINE_OP = BS.GKEY  AND BS.ROLE = 'LINEOP'
 LEFT OUTER JOIN 	USRTOSN4P.INV_EQ_BASE_ORDER_ITEM 		EQBOI 	ON U.DEPART_ORDER_ITEM_GKEY = EQBOI.GKEY
-LEFT OUTER JOIN 	USRTOSN4P.INV_EQ_BASE_ORDER 			EQBO 	ON EQBO.GKEY = EQBOI.EQO_GKEY AND EQBO.SUB_TYPE = 'EDO'
+LEFT OUTER JOIN 	USRTOSN4P.INV_EQ_BASE_ORDER 			EQBO 	ON EQBO.GKEY = EQBOI.EQO_GKEY 
 LEFT OUTER JOIN 	USRTOSN4P.REF_EQUIPMENT 				RE      ON U.ID = RE.ID_FULL
 LEFT OUTER JOIN 	USRTOSN4P.REF_EQUIP_TYPE 				RET     ON RET.GKEY =RE.EQTYP_GKEY
 LEFT OUTER JOIN 	USRTOSN4P.REF_EQUIP_TYPE 				ARQ     ON ARQ.GKEY = RET.ARCHETYPE
+
 LEFT OUTER JOIN 	USRTOSN4P.ARGO_CARRIER_VISIT 			CV      ON CV.GKEY = EQBO.VESSEL_VISIT_GKEY
 LEFT OUTER JOIN 	USRTOSN4P.VSL_VESSEL_VISIT_DETAILS 		VVD 	ON VVD.VVD_GKEY = CV.CVCVD_GKEY
 LEFT OUTER JOIN 	USRTOSN4P.VSL_VESSELS 					VS      ON VS.GKEY = VVD.VESSEL_GKEY
@@ -41,11 +50,41 @@ LEFT OUTER JOIN 	USRTOSN4P.ORD_EQUIPMENT_ORDER_ITEMS     ITEM    ON U.DEPART_ORD
 LEFT OUTER JOIN 	USRTOSN4P.REF_EQUIP_GRADES              EGR     ON EGR.gkey = U.GRADE_GKEY
 LEFT OUTER JOIN 	USRTOSN4P.ARGO_FACILITY                 AF      ON AF.GKEY = UFV.FCY_GKEY
 LEFT OUTER JOIN     USRTOSN4P.VSL_VESSEL_CLASSES            VSC     ON VSC.GKEY = VS.VESCLASS_GKEY
+
+LEFT OUTER JOIN     usrtosn4p.inv_goods                         t           ON  t.gkey  = u.goods
+LEFT OUTER JOIN     usrtosn4p.crg_bl_goods                      bg          ON  t.gkey  = bg.gds_gkey
+LEFT OUTER JOIN     usrtosn4p.crg_bills_of_lading               b           ON  bg.bl_gkey = b.gkey 
+LEFT JOIN USRTOSN4P.argo_carrier_visit       ACV2 ON ACV2.GKEY = B.CV_GKEY
+LEFT JOIN USRTOSN4P.VSL_VESSEL_VISIT_DETAILS VSD2 ON ACV2.CVCVD_GKEY = VSD2.VVD_GKEY
+LEFT JOIN USRTOSN4P.VSL_VESSELS              VS2  ON VS2.GKEY =VSD2.VESSEL_GKEY
+LEFT JOIN USRTOSN4P.VSL_VESSEL_CLASSES       VSC2 ON VSC2.GKEY = vs2.vesclass_gkey
+LEFT JOIN USRTOSN4P.INV_EQ_BASE_ORDER 		 EQBO2 ON EQBO2.GKEY = U.ARRIVE_ORDER_ITEM_GKEY and EQBO2.sub_type = 'ERO'
+
 WHERE  
 		BS.ID='WHL'
 		AND UFV.TRANSIT_STATE LIKE '%YARD%'
 		AND U.FREIGHT_KIND = 'MTY'
-		AND AF.ID = 'VNT'
+		AND AF.ID = 'ARG'
+        --and (B.NBR is not null and EQBO.NBR is not null)
+        
         --$P{FACILITY};
         ;
+select * from USRTOSN4P.inv_unit;
+select * from USRTOSN4P.inv_eq_base_order
+where nbr = 'HLCUBU3190400520' ;
 
+
+
+/*
+CASE WHEN EQBO.SUB_TYPE  IN ('EDO','BOOK') THEN EQBO.NBR
+WHEN  EQBO.NBR ='EDO' THEN  u.custdff_flex_string14 END AS "BOOKING RESERVA PTE"
+*/
+
+
+--*******************************************************************************
+--u.custdff_flex_string14 as "preasignacion",
+--EQBO.NBR as "eqnbr",
+--EQBO.SUB_TYPE as "subtypo",
+--EQBO2.SUB_TYPE as "subtypo2",
+
+--*******************************************************************************

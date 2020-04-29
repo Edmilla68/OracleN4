@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="STOCK WHL" language="groovy" pageWidth="2520" pageHeight="1000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2480" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85b9ba55-9940-4f51-a6dc-78dd50509b58">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.3" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="FACILITY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+U.ID                                    	AS "EQUIPAMIENTO"
+
+
+
+FROM   	            INV_UNIT 					U
+LEFT OUTER JOIN 	INV_UNIT_FCY_VISIT 			UFV     ON U.GKEY = UFV.UNIT_GKEY
+LEFT OUTER JOIN 	REF_BIZUNIT_SCOPED 			BS      ON U.LINE_OP = BS.GKEY  AND BS.ROLE = 'LINEOP'
+LEFT OUTER JOIN 	INV_EQ_BASE_ORDER_ITEM 		EQBOI 	ON U.DEPART_ORDER_ITEM_GKEY = EQBOI.GKEY
+LEFT OUTER JOIN 	INV_EQ_BASE_ORDER 			EQBO 	ON EQBO.GKEY = EQBOI.EQO_GKEY AND EQBO.SUB_TYPE = 'EDO'
+LEFT OUTER JOIN 	REF_EQUIPMENT 				RE      ON U.ID = RE.ID_FULL
+LEFT OUTER JOIN 	REF_EQUIP_TYPE 				RET     ON RET.GKEY =RE.EQTYP_GKEY
+LEFT OUTER JOIN 	REF_EQUIP_TYPE 				ARQ     ON ARQ.GKEY = RET.ARCHETYPE
+LEFT OUTER JOIN 	ARGO_CARRIER_VISIT 			CV      ON CV.GKEY = EQBO.VESSEL_VISIT_GKEY
+LEFT OUTER JOIN 	VSL_VESSEL_VISIT_DETAILS 	VVD 	ON VVD.VVD_GKEY = CV.CVCVD_GKEY
+LEFT OUTER JOIN 	VSL_VESSELS 				VS      ON VS.GKEY = VVD.VESSEL_GKEY
+LEFT OUTER JOIN 	SRV_EVENT 					EV      ON EV.APPLIED_TO_GKEY = EQBO.GKEY
+LEFT OUTER JOIN 	REF_BIZUNIT_SCOPED 			BSA     ON BSA.GKEY = EQBO.AGENT_GKEY AND BSA.ROLE = 'AGENT'
+LEFT OUTER JOIN 	REF_ROUTING_POINT 			RP      ON RP.GKEY =  EQBO.CUSTDFF_EDO_FLEX_STRING20
+LEFT OUTER JOIN 	REF_EQUIP_CONDITIONS 		REC 	ON REC.GKEY = U.CONDITION_GKEY
+LEFT OUTER JOIN 	ORD_EQUIPMENT_ORDER_ITEMS   ITEM    ON U.DEPART_ORDER_ITEM_GKEY = ITEM.GKEY
+LEFT OUTER JOIN 	REF_EQUIP_GRADES            EGR     ON EGR.gkey = U.GRADE_GKEY
+LEFT OUTER JOIN 	ARGO_FACILITY               AF      ON AF.GKEY = UFV.FCY_GKEY
+LEFT OUTER JOIN    	VSL_VESSEL_CLASSES          VSC     ON VSC.GKEY = VS.VESCLASS_GKEY
+WHERE
+		BS.ID='WHL'
+		AND UFV.TRANSIT_STATE LIKE '%YARD%'
+		AND U.FREIGHT_KIND = 'MTY'
+		AND AF.ID = $P{FACILITY}]]>
+	</queryString>
+	<field name="EQUIPAMIENTO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="27" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="3" width="124" height="20" uuid="add01b78-4b82-4f0b-a28c-eb66cbb30fa2"/>
+				<text><![CDATA[EQUIPAMIENTO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="31" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="6" width="124" height="20" uuid="571e0779-8194-452a-b38f-6c88c86eb9d9"/>
+				<textFieldExpression><![CDATA[$F{EQUIPAMIENTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

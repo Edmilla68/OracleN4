@@ -11,7 +11,7 @@ SELECT a.table_name, a.column_name, a.constraint_name, c.owner,
   JOIN all_constraints c_pk ON c.r_owner = c_pk.owner
                            AND c.r_constraint_name = c_pk.constraint_name
 WHERE c.constraint_type = 'R'
-   AND a.table_name like '%VSL_VESSELS%'
+   AND a.table_name like '%CRG_BILLS_OF_LADING%'
    ORDER BY R_TABLE_NAME;
 --REF_EQUIPMENT
 
@@ -55,7 +55,10 @@ where object_type = 'TABLE'
 AND OBJECT_NAME LIKE '%APPL%' 
 AND OWNER = 'USRTOSN4P';
 
+select * from USRTOSN4P.INV_UNIT;
+
 
 
 select table_name from all_tab_columns where column_name='EVENT_GKEY'  and owner='USRTOSN4P' order by table_name;
 
+select * from USRTOSN4P.CRG_BILLS_OF_LADING;
